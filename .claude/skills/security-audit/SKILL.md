@@ -110,9 +110,9 @@ reported again as a finding.
 ### 1. Accounts and authentication
 
 ```bash
-awk -F: '$3==0 {print "UID 0:", $1}' /etc/passwd
-awk -F: '$3>=1000 && $3<65534 {print $1, $3, $7}' /etc/passwd
-awk -F: '$3>0 && $3<1000 && $7 !~ /(nologin|false|sync|shutdown|halt)$/ {print "system account with shell:", $1, $7}' /etc/passwd
+awk -F: '$(3)==0 {print "UID 0:", $(1)}' /etc/passwd
+awk -F: '$(3)>=1000 && $(3)<65534 {print $(1), $(3), $(7)}' /etc/passwd
+awk -F: '$(3)>0 && $(3)<1000 && $(7) !~ /(nologin|false|sync|shutdown|halt)$/ {print "system account with shell:", $(1), $(7)}' /etc/passwd
 getent group wheel sudo adm docker libvirt kvm vboxusers
 grep -E '^(PASS_MAX_DAYS|UMASK|ENCRYPT_METHOD)' /etc/login.defs
 ls -la /etc/security/faillock.conf /etc/security/pwquality.conf 2>/dev/null
@@ -168,7 +168,7 @@ address, and does the firewall let traffic through to it.
 
 ```bash
 ss -tulpn
-ss -tulpnH | awk '{print $1, $5}' | sort -u
+ss -tulpnH | awk '{print $(1), $(5)}' | sort -u
 ```
 
 Without root you see processes only for your own sockets — the full mapping
@@ -355,7 +355,7 @@ the block so that it works in their shell (see `facts.md`; fish does not support
 ```bash
 cat > tmp/sec-audit.sh <<'EOF'
 sudo sshd -T 2>/dev/null | grep -E '^(permitrootlogin|passwordauthentication|permitemptypasswords|x11forwarding|allowusers|allowgroups|port|listenaddress|maxauthtries)'
-sudo awk -F: '$2==""' /etc/shadow
+sudo awk -F: '$(2)==""' /etc/shadow
 sudo grep -rh -E 'NOPASSWD|ALL *= *\(ALL' /etc/sudoers /etc/sudoers.d/ 2>/dev/null
 sudo ss -tulpn
 sudo firewall-cmd --list-all-zones | grep -A12 '(active)'

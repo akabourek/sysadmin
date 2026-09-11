@@ -139,7 +139,7 @@ Files in `/etc` that no package owns:
 
 ```bash
 find /etc -type f -print0 2>/dev/null | xargs -0 -n200 rpm -qf 2>&1 \
-  | grep -F 'not owned' | awk '{print $2}' | sort
+  | grep -F 'not owned' | awk '{print $(2)}' | sort
 ```
 
 A large part of the output is **legitimate** files: generated ones
@@ -251,7 +251,7 @@ space it takes, but as "it will come back", not as an orphan.
 ### 5. Users and groups
 
 ```bash
-getent passwd | awk -F: '$3>=100 && $3<1000 {print $1, $3, $6, $7}'
+getent passwd | awk -F: '$(3)>=100 && $(3)<1000 {print $(1), $(3), $(6), $(7)}'
 id
 for g in $(id -Gn); do getent group "$g" >/dev/null || echo "missing: $g"; done
 ```

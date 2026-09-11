@@ -51,7 +51,7 @@ every machine executes.
 ```bash
 getent hosts host-2.local
 ssh -G host-2 | grep -E '^(hostname|user|port|forwardagent|stricthostkeychecking) '
-ssh-keygen -F host-2.local | grep -v '^#' | awk '{print $2}'   # empty = first contact
+ssh-keygen -F host-2.local | grep -v '^#' | awk '{print $(2)}'   # empty = first contact
 git remote get-url origin; git status -sb                        # public repo
 git -C hosts remote get-url origin; git -C hosts status -sb      # hosts repo
 ssh-keygen -lF github.com | grep -i ed25519                      # fingerprint for the clone step
