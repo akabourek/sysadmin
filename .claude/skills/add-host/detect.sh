@@ -4,6 +4,9 @@
 # The output contains the machine-id, addresses and a list of services. It does not belong in a commit (tmp/ is in .gitignore).
 # A missing tool is printed as "(x missing)", so "not there" can be told apart from "found nothing".
 export LC_ALL=C
+# Over ssh without a login shell, Debian-family systems give a normal user a PATH
+# without the sbin directories, so tools like swapon or zpool would look missing.
+export PATH="$PATH:/usr/local/sbin:/usr/sbin:/sbin"
 s() { printf '\n===== %s\n' "$*"; }
 has() { command -v "$1" >/dev/null 2>&1; }
 need() { has "$1" || { echo "($1 missing)"; return 1; }; }
