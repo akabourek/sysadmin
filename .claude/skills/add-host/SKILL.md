@@ -304,9 +304,12 @@ cloned on it for this. A1 and A2 are already done.
    ```
 3. **Root reading in one line (§3b)**, run by the user because of sudo:
    ```bash
-   ssh -t host-2.local 'sudo nft list ruleset; sudo sshd -T' 2>&1 | tee tmp/root-host-2.txt
+   ssh -t host-2.local 'sudo iptables-save; command -v nft >/dev/null && sudo nft list ruleset; command -v ufw >/dev/null && sudo ufw status verbose; sudo sshd -T' 2>&1 | tee tmp/root-host-2.txt
    ```
-   Without sudo on the machine, use `su -c '…'` inside the quotes.
+   `iptables-save` comes first because `nft` is not installed everywhere (the
+   `nftables` package is optional on Debian and Raspberry Pi OS, where
+   iptables already uses the nf_tables backend). Without sudo on the machine,
+   use `su -c '…'` inside the quotes.
 4. **Facts, notes, registry, commit** as B steps 4 and 6–12, with these
    differences:
    - *Access* in `facts.md` says: managed over SSH, from which machine or
