@@ -1,6 +1,6 @@
 ---
 name: add-host
-description: Use when the user wants to add another computer to this repository - "add a machine", "add a host", "new computer", "onboard a host", "deploy to another machine", "set up on another computer", "installation guide", "we are on a new machine", "gather facts" - including a headless machine without monitor and keyboard reachable only over SSH, or when running on a machine that has no hosts/<hostname>/facts.md yet.
+description: Use when the user wants to add another computer to this repository - "add a machine", "add a host", "new computer", "onboard a host", "deploy to another machine", "set up on another computer", "installation guide", "we are on a new machine", "gather facts" - including a headless machine without monitor and keyboard reachable only over SSH, a machine where Claude Code cannot run and that is managed over SSH instead, or when running on a machine that has no hosts/<hostname>/facts.md yet.
 ---
 
 # Add a host
@@ -13,24 +13,27 @@ How to get both repositories and Claude onto another computer and create its
 - **Private repo `sysadmin-hosts`** — cloned into `~/Projects/sysadmin/hosts`.
   The new machine commits its own facts there, with a deploy key.
 
-**Core principle: Claude always runs on the machine it manages.** A machine
-without a monitor is not managed over SSH from here. The user logs in to it,
-clones both repositories and starts Claude there. The rules in CLAUDE.md then
-apply unchanged: local handoff of root scripts, `$(hostname)` in skills, and
-the report generators.
+**Two ways to manage a machine (CLAUDE.md §4), both valid; the user decides.**
+*Locally*: the user logs in, clones both repositories and starts Claude on the
+machine, and the rules apply unchanged (procedures A and B). *Over SSH*: Claude
+stays on the machine it runs on and reaches the new one with `ssh`; nothing is
+cloned there (procedure C). Over SSH is the only option where Claude Code
+cannot run (it needs x64 or ARM64 and at least 4 GB of RAM), and a sensible one
+for a small appliance.
 
-**Security boundary.** The new machine gets a deploy key with write access to
+**Security boundary.** In local management the new machine gets a deploy key with write access to
 `sysadmin-hosts` only. GitHub deploy keys are unique per repository, so it
 cannot push to the public repo. General changes (rules, playbooks, skills) are
 pushed from a machine where the user has personal credentials. This is
 deliberate: a compromised headless box can alter host data, but not the rules
-every machine executes.
+every machine executes. Over SSH the machine gets no key and no clone at all.
 
 ## Where am I
 
 | Situation | How to tell | Procedure |
 |---|---|---|
 | The new machine is a **different computer** from the one I run on | The user names another hostname, address or SSH alias | **A** |
+| The new machine will be **managed over SSH** from the machine I run on | A2 shows an architecture other than x86_64/aarch64, a 32-bit userland or less than 4 GiB of RAM, or the user chooses it | **A1, A2, then C** |
 | I am running **on the new machine** | `ls hosts/$(hostname)/facts.md` fails | **B** |
 | `facts.md` exists | — | This skill is not needed. Only update the facts when they are stale (§4). |
 
@@ -43,6 +46,7 @@ every machine executes.
 | Installing packages or Claude, creating a key, cloning on the new machine | **The user does it.** I prepare the exact commands. |
 | Adding the deploy key on GitHub (`gh repo deploy-key add`) | §3a. The *impact* must say: a key with write access may push to any branch of `sysadmin-hosts`, including `main`, so whoever takes over the new machine can rewrite host data for every machine (facts, notes, reports, the registry), for example add an accepted risk that hides a finding. It cannot touch the rules and skills in the public repo. Rollback: delete the key in `sysadmin-hosts` Settings → Deploy keys. |
 | Detection set on the new machine | §4, approval beforehand. For a new machine §4 is more specific than §3b. |
+| Read-only diagnostics without root over SSH on a machine listed under `[remote]` in `hosts/sysadmin.toml` | Directly, as §3b (CLAUDE.md §4). Before the machine is listed, every connection is §3a. |
 
 ## A. Preparation from another machine
 
@@ -94,6 +98,8 @@ is expanded here.
 ssh -a -o BatchMode=yes host-2 bash -s <<'EOF'
 echo "host: $(hostname)"
 . /etc/os-release; echo "os: $PRETTY_NAME"
+echo "arch: kernel $(uname -m), userland $(getconf LONG_BIT)-bit"
+echo "mem: $(awk '/^MemTotal:/ {printf "%.1f GiB", $(2)/1048576}' /proc/meminfo)"
 for b in git curl tmux sudo; do echo "$b: $(command -v $b || echo missing)"; done
 echo "claude: $(command -v claude || ls ~/.local/bin/claude 2>/dev/null || echo missing)"
 echo "groups: $(id -Gn)"
@@ -129,6 +135,8 @@ nothing gets written.
 | Output | Meaning |
 |---|---|
 | No `host:` line | The connection to the new machine already failed. The lines below mean nothing → A1, first contact. |
+| `arch:` other than `x86_64`/`aarch64`, or `userland 32-bit` | Claude Code cannot run there. A 64-bit kernel with a 32-bit userland is common on Raspberry Pi OS. Tell the user: the options are a 64-bit reinstall, or management over SSH → C. |
+| `mem:` below 4 GiB | Below the documented minimum for Claude Code. Tell the user; management over SSH (C) avoids it. |
 | `public: failed` | The public repo cannot be read anonymously over HTTPS: not published yet, wrong `<owner>`, no network, or `git: missing`. Say so and agree on a fix. Do not work around it with a personal key on the machine. |
 | `repo:` present, `hosts: none` | Only the public repo is cloned. Continue with the hosts clone (stage 3). |
 | `hosts:` prints a path other than `…/Projects/sysadmin/hosts` | `hosts/` exists but is not its own repository, so git fell through to the parent. Stop and find out what it is before cloning into it. |
@@ -197,8 +205,8 @@ git -C hosts config user.name '<name>'; git -C hosts config user.email '<email>'
 - Finally, type on the machine: *"we are on a new machine, gather facts"* →
   procedure B.
 
-On this machine the work ends here. Do not write facts of another machine from
-here.
+In local management the work on this machine ends here. Do not write facts of
+another machine from here; that is done in B, on the machine itself.
 
 ## B. First session on the new machine
 
@@ -274,11 +282,51 @@ here.
     They contain the machine ID, addresses and ports.
 13. Offer a first check (`system-check`). Do not run it.
 
+## C. Managed over SSH
+
+The machine is reached from the machine I run on. Nothing is installed or
+cloned on it for this. A1 and A2 are already done.
+
+1. **Record the decision** in `hosts/sysadmin.toml`:
+   ```toml
+   [remote]
+   host-2 = "host-2.local"   # hostname = "ssh alias"
+   ```
+   The key is the output of `hostname` from A2 (`host:`), never the alias.
+   Check that the alias really leads to that machine: an alias with a similar
+   name can point somewhere else in `~/.ssh/config`, and `host:` in A2 is the
+   proof. From now on read-only diagnostics over SSH on it are §3b.
+2. **One approval** for pulling the hosts repo (§7) and the detection (§4):
+   ```bash
+   git -C hosts pull
+   mkdir -p tmp && ssh -a -o BatchMode=yes host-2.local bash -s \
+     < .claude/skills/add-host/detect.sh > tmp/detect-host-2.txt 2>&1
+   ```
+3. **Root reading in one line (§3b)**, run by the user because of sudo:
+   ```bash
+   ssh -t host-2.local 'sudo nft list ruleset; sudo sshd -T' 2>&1 | tee tmp/root-host-2.txt
+   ```
+   Without sudo on the machine, use `su -c '…'` inside the quotes.
+4. **Facts, notes, registry, commit** as B steps 4 and 6–12, with these
+   differences:
+   - *Access* in `facts.md` says: managed over SSH, from which machine or
+     machines, alias, account, key or password, and why SSH (for example
+     "32-bit userland, Claude Code cannot run").
+   - `NOTES.md` records that no repository and no deploy key live on the
+     machine, and how the fingerprint of the machine key was verified if this
+     was the first contact.
+   - The commit (`hosts/sysadmin.toml`, the host directory, the registry row)
+     and the push are done here with `git -C hosts`. The public repo stays
+     untouched.
+5. **Cleanup:** delete `tmp/detect-<hostname>.txt` and `tmp/root-<hostname>.txt`.
+6. Offer a first check (`system-check`), run over SSH with the hostname given
+   explicitly. Do not run it.
+
 ## Common mistakes
 
 | Mistake | Why it hurts |
 |---|---|
-| Proposing to manage the new machine over SSH from here (detection, sudo, extending the rules) | The rules and skills assume a local run. Cloning and running Claude on the machine bends nothing. |
+| Choosing the mode for the user, or managing a machine over SSH without its `[remote]` entry | Both modes are valid and the choice is the user's. Without the entry, SSH reads have no §3b cover and the other machines do not know how the host is managed. |
 | Grepping the whole `~/.ssh/config` | Prints passwords from comments. Use `ssh -G <alias>`. |
 | Assuming the clone will succeed | The private hosts repo over SSH needs a key on the new machine; the HTTPS clone of the public repo needs it to be actually public. Verify in A2. |
 | A2 without `-a` | With `ForwardAgent yes`, the inner ssh and git get through with the personal key and the result lies. |
@@ -300,3 +348,6 @@ here.
 | Pushing general changes from a headless machine (personal key, stored token, write key on the public repo) | Breaks the security boundary: a compromised box could alter the rules every machine executes. General changes go from a machine with the user's personal credentials, after the §8b sieve. |
 | Committing host data with plain `git` instead of `git -C hosts` | `hosts/` is ignored by the public repo, so nothing is committed; with `git add -f`, host data lands in the published repository. |
 | Taking `Hi <owner>/sysadmin-hosts!` or `hosts-access: ok` as proof of write access | Both show read access only. Write access shows at the first push. |
+| Skipping the `arch:` and `mem:` lines in A2 | The mismatch shows only when Claude fails to install on the machine, a whole round too late. |
+| Using `$(hostname)` or running a skill's commands locally for a machine under `[remote]` | The report lands in the wrong host directory and the findings describe the wrong machine. |
+| Piping a root script into `ssh … sudo bash -s` | sudo reads the password from the same terminal and swallows the script. Copy the script over first, then run it with `ssh -t`. |

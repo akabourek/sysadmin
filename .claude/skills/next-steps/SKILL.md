@@ -47,6 +47,9 @@ check, not a way around it.
 cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 ```
 
+For a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
+use its hostname instead of `$(hostname)`, here and in `--host`.
+
 In `NOTES.md`, look for the **Accepted risks** section and for sentences such
 as "deliberately not addressed", "user's decision", "leave as is". Headings
 and notes in host files use the language from `hosts/sysadmin.toml`, so look

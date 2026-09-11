@@ -98,6 +98,11 @@ cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 ip -brief address; ip route get 1.1.1.1
 ```
 
+On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
+use its hostname instead of `$(hostname)` and run every command in this skill
+through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
+from CLAUDE.md §4.
+
 Without the facts you cannot tell the right firewall, LSM or package manager.
 From `ip`, find out whether the machine is behind NAT (address from 10/8,
 172.16/12, 192.168/16) or directly on a public address — that shifts the

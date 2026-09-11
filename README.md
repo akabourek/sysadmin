@@ -54,23 +54,35 @@ with the language of host files and reports:
 
 ```toml
 language = "en"   # or "cs"
+
+[remote]          # machines managed over SSH: hostname = "ssh alias"
+# host-2 = "host-2.local"
 ```
 
 Claude creates both on the first run if you ask it to. If you want host data
 backed up and shared between your machines, push the hosts repository to a
 **private** remote. Never make it public ([CLAUDE.md](CLAUDE.md) §8).
 
-**A machine without monitor and keyboard** is not managed remotely from another
-computer. The procedure is the same, you just log in over `ssh` first and run
-the clones and `claude` there. Logging in to Claude works without a browser as
-well: it prints a link you open on another device. Clone the public repository
-over HTTPS, without a key. Clone the hosts repository with a **deploy key that
-has write access to `sysadmin-hosts` only**; GitHub deploy keys are unique per
-repository. Such a machine cannot push to the public repository, so general
-changes are pushed from a machine where you have your personal credentials.
-This is a deliberate security boundary: a compromised headless box can alter
-host data, but not the rules every machine executes. The `add-host` skill
-guides the whole procedure.
+**A machine without monitor and keyboard** can be managed in two ways, and both
+are valid.
+
+- *Locally.* You log in over `ssh` and run the clones and `claude` there.
+  Logging in to Claude works without a browser as well: it prints a link you
+  open on another device. Clone the public repository over HTTPS, without
+  a key, and the hosts repository with a **deploy key that has write access to
+  `sysadmin-hosts` only**; GitHub deploy keys are unique per repository. Such
+  a machine cannot push to the public repository, so general changes are
+  pushed from a machine where you have your personal credentials. This is
+  a deliberate security boundary: a compromised headless box can alter host
+  data, but not the rules every machine executes.
+- *Over SSH.* Claude runs on another of your machines and reaches this one
+  with `ssh`; nothing from the repositories is stored on it. This is the way
+  for machines where Claude Code cannot run (it needs x64 or ARM64 and 4 GB of
+  RAM, so not a Raspberry Pi with a 32-bit userland), and a good fit for small
+  appliances. Such machines are listed under `[remote]` in
+  `hosts/sysadmin.toml`.
+
+The `add-host` skill guides both procedures.
 
 ## Supported environments
 

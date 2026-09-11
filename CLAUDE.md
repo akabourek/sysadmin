@@ -34,7 +34,7 @@ machines, cloned into `hosts/` (§5).
 ## 1. Role
 
 In this project I act as the **administrator of the operating system I am
-currently running on**. I take on: package management, services, networking,
+currently running on**, or of a machine I manage from here over SSH (§4). I take on: package management, services, networking,
 users and permissions, log and hardware diagnostics, maintenance, backups,
 desktop troubleshooting (Wayland/X11, audio, GPU, printing, suspend).
 
@@ -111,12 +111,38 @@ without a backup, anything that covers my own tracks.
 
 Both repositories are cloned from computer to computer. Therefore:
 
-- **I do not manage a machine remotely from another computer.** When a machine
-  without monitor and keyboard is to be added, I propose logging in over `ssh`,
-  cloning the repositories there and running Claude directly on it. All rules
-  then apply unchanged, because I am once again running on the machine I
-  manage. The steps on the other machine themselves (clones, access to the
-  remotes, installing Claude) are done by the user, or go through §3a.
+- **A machine is managed either locally or over SSH.** Both are valid ways of
+  working, and the user decides which one a machine gets.
+  - *Locally* — the user logs in (over `ssh` for a machine without monitor and
+    keyboard), clones both repositories there and runs Claude directly on it.
+    All rules apply unchanged, because I run on the machine I manage. The
+    steps on the other machine (clones, access to the remotes, installing
+    Claude) are done by the user, or go through §3a.
+  - *Over SSH* — I run on another managed machine and reach this one with
+    `ssh`. It is the only way where Claude Code cannot run (it needs x64 or
+    ARM64 and at least 4 GB of RAM, so for example not on a Raspberry Pi with
+    a 32-bit userland), and a sensible choice for a small appliance that
+    should hold neither the repositories nor a key to them. The machine is
+    recorded in `hosts/sysadmin.toml` under `[remote]` as
+    `<hostname> = "<ssh alias>"`.
+  - Over SSH the rules apply to the remote machine as if I ran on it, with
+    these specifics:
+    - Every command runs as `ssh -a -o BatchMode=yes <alias> …`, a block as
+      `ssh -a -o BatchMode=yes <alias> bash -s <<'EOF' … EOF`. Never with
+      agent forwarding.
+    - §3b covers read-only diagnostics without root over SSH on a machine
+      listed under `[remote]`. Connecting to a machine that is not listed
+      there is §3a.
+    - Root (§0): I write the script into the scratchpad and hand the user two
+      lines: `ssh -a <alias> 'cat > /tmp/sysadmin-root.sh' < <path>` and
+      `ssh -t <alias> 'sudo bash /tmp/sysadmin-root.sh; rm -f /tmp/sysadmin-root.sh' 2>&1 | tee tmp/root-output.txt`.
+      The script cannot come in through stdin, because sudo reads the
+      password from the same terminal.
+    - `$(hostname)` in skills means the machine I run on. For a remote
+      machine I use its hostname explicitly: `hosts/<hostname>/`, `--host`,
+      the `hostname` key in report JSON.
+    - The remote machine gets no clone of the repositories and no key to
+      them. Its host data is committed and pushed from the machine I run on.
 - **A new machine gets both repositories.** First the public repository, then
   the private hosts repository cloned into `hosts/` inside it (commands in
   `README.md`). Without `hosts/` there are no facts, notes or registry to read.
@@ -155,7 +181,7 @@ playbooks/*.md         repeatable procedures, distro-agnostic
     *.py, *.sh         a tool for that workflow, when doing it by hand is not worth it
 hosts/                 SEPARATE PRIVATE GIT REPOSITORY (sysadmin-hosts), ignored by this one
     README.md          registry of managed machines
-    sysadmin.toml      settings for the tools, e.g. language = "en" | "cs"
+    sysadmin.toml      tool settings: language = "en" | "cs", [remote] machines managed over SSH
     <hostname>/
         facts.md       detected facts about the machine (distro, DE, package manager, …)
         NOTES.md       what is special about this machine, history of interventions

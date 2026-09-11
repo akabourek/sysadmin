@@ -33,6 +33,11 @@ user asks for after reading the table.
 cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 ```
 
+On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
+use its hostname instead of `$(hostname)` and run every command in this skill
+through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
+from CLAUDE.md §4.
+
 If there are no facts, agree on collecting them (CLAUDE.md §4) — without them
 you cannot derive the right commands. In `NOTES.md` look for the **Known noise**
 section (headings in host files use the language from `hosts/sysadmin.toml`):

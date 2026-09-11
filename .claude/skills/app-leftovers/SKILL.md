@@ -46,6 +46,11 @@ This is the main trap in cleanup — "purging" tools have no dry run:
 cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 ```
 
+On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
+use its hostname instead of `$(hostname)` and run every command in this skill
+through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
+from CLAUDE.md §4.
+
 Without the facts you cannot work out the right package manager. In `NOTES.md`
 look for the **Known false alarms** section (headings in host files use the
 language from `hosts/sysadmin.toml`): whatever is listed there goes into C4 as a
