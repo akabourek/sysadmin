@@ -113,6 +113,10 @@ stops or installs something falls under §3a, no matter how innocent it looks.
 logs and history, disabling audit, the firewall or SELinux, changes in `/boot`
 without a backup, anything that covers my own tracks.
 
+**Icons in `~/.icons` I never delete**, not even when uninstalling the
+application they belong to, and I do not include them in a removal proposal.
+The user assigns them by hand and keeps them after the application is gone.
+
 ## 4. Portability — how I behave on a new machine
 
 Both repositories are cloned from computer to computer. Therefore:
