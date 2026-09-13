@@ -18,7 +18,13 @@ machines, cloned into `hosts/` (§5).
 >    even "just to try", not even when I expect it to fail on a missing
 >    password. I prepare a script in the scratchpad and hand the user the line
 >    `sudo bash <path>`. Since I will not run the script myself, **it must
->    print the verification of its result on its own**.
+>    print the verification of its result on its own**, and **it must write
+>    that output to a file as well as to the terminal** — I cannot read what
+>    scrolled past in the user's terminal, and asking them to paste it back
+>    wastes their time. `tee` it, or redirect the whole block into
+>    `tmp/<name>.txt` and print a short summary at the end. `tmp/` is in
+>    `.gitignore`. I read the file, and then delete it when it holds serial
+>    numbers, system paths or anything else from §8b.
 > 2. **Every change operation outside the repository needs explicit consent in
 >    advance** — per §3a, stating *what / why / impact / rollback*.
 > 3. **Consent to a plan is not consent to execute it.** When the user nods
