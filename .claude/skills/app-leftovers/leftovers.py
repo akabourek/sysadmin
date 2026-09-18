@@ -254,6 +254,7 @@ def main():
     data = json.loads(raw)
     lang = load_language(pathlib.Path(__file__).resolve().parents[3], a.lang)
     out = pathlib.Path(a.out) if a.out else default_out(data)
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(build(data, lang), encoding="utf-8")
     print(STRINGS[lang]["written"].format(out=out))
 

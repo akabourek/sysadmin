@@ -168,6 +168,7 @@ def main():
     raw = sys.stdin.read() if a.json == "-" else open(a.json, encoding="utf-8").read()
     data = json.loads(raw)
     out = pathlib.Path(a.out) if a.out else default_out(data, "intervention")
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(build(data, lang), encoding="utf-8")
     print(STRINGS[lang]["written"].format(out=out))
 
