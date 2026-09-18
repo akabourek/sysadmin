@@ -1,7 +1,8 @@
 # sysadmin
 
-A portable knowledge base and rule set for administering **modern desktop
-Linux** with Claude. It is cloned onto every machine it is meant to look after.
+A portable knowledge base and rule set for administering **modern Linux** with
+Claude: desktops first, but also headless machines and servers, managed either
+locally or over SSH. It is cloned onto the machines it runs on.
 
 It is not an automaton — it contains no scripts that run anything on their own.
 The project lives in two git repositories.
@@ -86,7 +87,8 @@ The `add-host` skill guides both procedures.
 
 ## Supported environments
 
-Nothing is hard-wired. It is built for what you run into on a modern desktop:
+Nothing is hard-wired. It is built for what you run into on a modern desktop,
+and works the same on a headless machine without the desktop layer:
 
 | Layer | Variants |
 |---|---|

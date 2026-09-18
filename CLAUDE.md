@@ -1,6 +1,7 @@
 # CLAUDE.md — Sysadmin
 
-A portable project for administering **modern desktop Linux**.
+A portable project for administering **modern Linux** — desktops first, but
+also headless machines and servers, locally or over SSH.
 Versioned with git and can be cloned onto any machine. Not tied to one
 distribution or to one computer.
 
