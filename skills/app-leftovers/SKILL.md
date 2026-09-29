@@ -16,7 +16,7 @@ a package is therefore **not** an orphan — it is a directory for which you did
 not find a package. The difference between those two is this whole skill.
 
 The skill **never deletes anything.** Deletion is a separate task under
-CLAUDE.md §3a.
+AGENTS.md §3a.
 
 ## Rules of engagement
 
@@ -49,7 +49,7 @@ cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
 use its hostname instead of `$(hostname)` and run every command in this skill
 through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
-from CLAUDE.md §4.
+from AGENTS.md §4.
 
 Without the facts you cannot work out the right package manager. In `NOTES.md`
 look for the **Known false alarms** section (headings in host files use the
@@ -122,7 +122,7 @@ done
 ```
 
 If that comes back empty, the curation has nothing to stand on and the
-distribution tool wins (CLAUDE.md: the distribution's recommended practice takes
+distribution tool wins (AGENTS.md: the distribution's recommended practice takes
 precedence). On a real run the manual curation did worse than `autoremove` for
 21 of 23 packages, and for one of them it was plain wrong. AppImages cannot be
 checked this way — they are compressed; but they bundle their libraries, so the
@@ -343,7 +343,7 @@ A table by confidence tier, sorted by size within each tier. Below it:
 Do not write the report by hand — build the JSON and run the generator:
 
 ```bash
-python3 .claude/skills/app-leftovers/leftovers.py findings.json
+python3 skills/app-leftovers/leftovers.py findings.json
 ```
 
 Without `-o` it derives the path itself:
@@ -381,10 +381,10 @@ are accepted as aliases; any other or missing value is counted as C3.
 `kb` is **kilobytes straight from `du -sk`** — do not write "412 MB" by hand, the
 generator formats and adds it up itself. It sums only C1 and C2: C3 is a
 hypothesis, and adding it into one number would turn an estimate into a promise.
-Save the JSON to the scratchpad, not to the repository.
+Save the JSON to `tmp/`, not to a tracked file.
 
 A deletion is then recorded in the existing `*-intervention.md`
-(`.claude/skills/system-check/intervention.py`) — there is no separate record
+(`skills/system-check/intervention.py`) — there is no separate record
 type for cleanup.
 
 ## After the search

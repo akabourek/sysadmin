@@ -20,7 +20,7 @@ patterns sorted by frequency.
 |---|---|
 | Read-only command without root | Run it straight away, without asking. |
 | Read-only command with root (`smartctl`, `ausearch`, `dmidecode`) | Collect them and present them for approval **as one line each**, typically in a single batch after the basic round. |
-| Any change to the system or to user files | Always per CLAUDE.md §3a: what / why / impact / rollback. Never as part of the check. |
+| Any change to the system or to user files | Always per AGENTS.md §3a: what / why / impact / rollback. Never as part of the check. |
 
 The check itself **never fixes anything.** A fix is a separate task that the
 user asks for after reading the table.
@@ -36,9 +36,9 @@ cat hosts/$(hostname)/facts.md hosts/$(hostname)/NOTES.md 2>/dev/null
 On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
 use its hostname instead of `$(hostname)` and run every command in this skill
 through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
-from CLAUDE.md §4.
+from AGENTS.md §4.
 
-If there are no facts, agree on collecting them (CLAUDE.md §4) — without them
+If there are no facts, agree on collecting them (AGENTS.md §4) — without them
 you cannot derive the right commands. In `NOTES.md` look for the **Known noise**
 section (headings in host files use the language from `hosts/sysadmin.toml`):
 whatever is listed there goes into the report as P4 in one summary row, not as
@@ -181,7 +181,7 @@ too. So ask for verification with the vendor in one line, and only when a
 symptom or an offered update justifies it.
 
 The output of `fwupdmgr get-devices` contains **serial numbers** of peripherals.
-Do not copy it whole into the report or into the repository (CLAUDE.md §8b) —
+Do not copy it whole into the report or into the repository (AGENTS.md §8b) —
 the finding gets the version and date, not the dump.
 
 #### Recording in the facts
@@ -229,7 +229,7 @@ sudo ausearch -m avc -ts today   # SELinux denials straight from audit.log
 sudo dmidecode -t memory         # RAM, when hardware is suspected
 ```
 
-The format is one line per command per CLAUDE.md §3b: what I will run and why I
+The format is one line per command per AGENTS.md §3b: what I will run and why I
 need to know it. In a batch, not one by one.
 
 **Do not run `sudo` yourself — it has no TTY for the password and fails.** The
@@ -323,7 +323,7 @@ localized.
 not a long question. The user says yes or no.
 
 ```bash
-python3 .claude/skills/system-check/report.py findings.json
+python3 skills/system-check/report.py findings.json
 ```
 
 Without `-o` it derives the path itself:
@@ -354,8 +354,8 @@ the rest is optional:
 ```
 
 The generator sorts the findings by severity and computes the summary counts
-itself — do not pre-sort them. Save the JSON to the scratchpad, not to the
-repository.
+itself — do not pre-sort them. Save the JSON to `tmp/`, not to a tracked
+file.
 
 ### Intervention log
 
@@ -363,7 +363,7 @@ repository.
 resolved and how:
 
 ```bash
-python3 .claude/skills/system-check/intervention.py interventions.json
+python3 skills/system-check/intervention.py interventions.json
 ```
 
 Path without `-o`: `hosts/<hostname>/reports/<YYYY-MM-DD_HHMM>-intervention.md`.

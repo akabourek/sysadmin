@@ -65,7 +65,7 @@ STRINGS = {
         "next_steps": "Proposed cleanup order",
         "footer": ("Snapshot taken {when}. This report is read-only — **nothing "
                    "listed here has been deleted.** Every deletion is a separate "
-                   "task with approval under CLAUDE.md §3a and is recorded in "
+                   "task with approval under AGENTS.md §3a and is recorded in "
                    "`*-intervention.md`. {c3} items are heuristics, not findings: "
                    "the user decides on them."),
         "written": "written: {out}",
@@ -97,7 +97,7 @@ STRINGS = {
         "next_steps": "Navržené pořadí úklidu",
         "footer": ("Snímek pořízen {when}. Report je čtecí — **nic z uvedeného nebylo "
                    "smazáno.** Každé smazání je samostatné zadání se schválením podle "
-                   "CLAUDE.md §3a a zapisuje se do `*-intervention.md`. Položky {c3} jsou "
+                   "AGENTS.md §3a a zapisuje se do `*-intervention.md`. Položky {c3} jsou "
                    "heuristika, ne zjištění: o nich rozhoduje uživatel."),
         "written": "zapsano: {out}",
     },

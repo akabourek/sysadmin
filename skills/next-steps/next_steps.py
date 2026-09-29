@@ -168,8 +168,8 @@ def age_days(now, when):
 
 
 def repo_root():
-    """Repository root - three levels above .claude/skills/<skill>/."""
-    return pathlib.Path(__file__).resolve().parents[3]
+    """Repository root - two levels above skills/<skill>/."""
+    return pathlib.Path(__file__).resolve().parents[2]
 
 
 def load_language(root, override):

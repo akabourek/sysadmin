@@ -37,7 +37,7 @@ check, not a way around it.
 | Running `next_steps.py` | Directly. It reads only files in the repository. |
 | Reading the live system | **Not done.** Diagnostics are the job of the recommended check, not of this skill. |
 | Running a recommended skill or playbook | Only on the user's explicit instruction. A recommendation is not consent. |
-| Any fix | Never. Always a separate task under CLAUDE.md §3a. |
+| Any fix | Never. Always a separate task under AGENTS.md §3a. |
 
 ## Procedure
 
@@ -64,11 +64,11 @@ machine and run the first check.
 ### 1. Collection
 
 ```bash
-python3 .claude/skills/next-steps/next_steps.py                # this machine
-python3 .claude/skills/next-steps/next_steps.py --host host-2  # another machine in the repo
-python3 .claude/skills/next-steps/next_steps.py --all          # findings from the whole history
-python3 .claude/skills/next-steps/next_steps.py --days 180     # only the last half year
-python3 .claude/skills/next-steps/next_steps.py --lang en      # override the report language
+python3 skills/next-steps/next_steps.py                # this machine
+python3 skills/next-steps/next_steps.py --host host-2  # another machine in the repo
+python3 skills/next-steps/next_steps.py --all          # findings from the whole history
+python3 skills/next-steps/next_steps.py --days 180     # only the last half year
+python3 skills/next-steps/next_steps.py --lang en      # override the report language
 ```
 
 The report language comes from `language` in `hosts/sysadmin.toml` (`en` when

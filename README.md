@@ -1,7 +1,7 @@
 # sysadmin
 
 A portable knowledge base and rule set for administering **modern Linux** with
-Claude: desktops first, but also headless machines and servers, managed either
+a coding agent — any agent, not one product: desktops first, but also headless machines and servers, managed either
 locally or over SSH. It is cloned onto the machines it runs on.
 
 It is not an automaton — it contains no scripts that run anything on their own.
@@ -9,10 +9,10 @@ The project lives in two git repositories.
 
 This public repository contains:
 
-- **rules** for how Claude behaves on a machine and what it must get approved
-  ([CLAUDE.md](CLAUDE.md)),
+- **rules** for how the agent behaves on a machine and what it must get
+  approved ([AGENTS.md](AGENTS.md)),
 - **procedures** written distro-agnostically ([`playbooks/`](playbooks/README.md)),
-- **skills** — recurring workflows for Claude (`.claude/skills/`).
+- **skills** — recurring workflows for the agent ([`skills/`](skills/)).
 
 A private hosts repository, cloned into `hosts/` and ignored by this one,
 contains:
@@ -30,13 +30,13 @@ contains:
 git clone https://github.com/<owner>/sysadmin.git ~/Projects/sysadmin
 git clone git@github.com:<owner>/sysadmin-hosts.git ~/Projects/sysadmin/hosts
 cd ~/Projects/sysadmin
-claude
+# start your agent here
 ```
 
 The public repository is read-only over HTTPS and needs no key. The hosts
 repository is private and needs an SSH key with access to it.
 
-Then just say: *"we are on a new machine, collect the facts"*. Claude asks
+Then just say: *"we are on a new machine, collect the facts"*. The agent asks
 permission for the detection set, creates `hosts/<hostname>/`, writes the facts
 and adds the machine to the registry in `hosts/README.md`. From then on it works
 with what is actually on this particular computer. The `add-host` skill guides
@@ -60,30 +60,43 @@ language = "en"   # or "cs"
 # host-2 = "host-2.local"
 ```
 
-Claude creates both on the first run if you ask it to. If you want host data
+The agent creates both on the first run if you ask it to. If you want host data
 backed up and shared between your machines, push the hosts repository to a
-**private** remote. Never make it public ([CLAUDE.md](CLAUDE.md) §8).
+**private** remote. Never make it public ([AGENTS.md](AGENTS.md) §8).
 
 **A machine without monitor and keyboard** can be managed in two ways, and both
 are valid.
 
-- *Locally.* You log in over `ssh` and run the clones and `claude` there.
-  Logging in to Claude works without a browser as well: it prints a link you
-  open on another device. Clone the public repository over HTTPS, without
+- *Locally.* You log in over `ssh` and run the clones and your agent there.
+  Most agents log in without a browser as well: they print a link you open on
+  another device. Clone the public repository over HTTPS, without
   a key, and the hosts repository with a **deploy key that has write access to
   `sysadmin-hosts` only**; GitHub deploy keys are unique per repository. Such
   a machine cannot push to the public repository, so general changes are
   pushed from a machine where you have your personal credentials. This is
   a deliberate security boundary: a compromised headless box can alter host
   data, but not the rules every machine executes.
-- *Over SSH.* Claude runs on another of your machines and reaches this one
+- *Over SSH.* The agent runs on another of your machines and reaches this one
   with `ssh`; nothing from the repositories is stored on it. This is the way
-  for machines where Claude Code cannot run (it needs x64 or ARM64 and 4 GB of
-  RAM, so not a Raspberry Pi with a 32-bit userland), and a good fit for small
+  for machines where your agent cannot run (most need a 64-bit userland and
+  several GiB of RAM, so not a Raspberry Pi with a 32-bit userland), and a good fit for small
   appliances. Such machines are listed under `[remote]` in
   `hosts/sysadmin.toml`.
 
 The `add-host` skill guides both procedures.
+
+## Using it with an agent
+
+The project is agent-agnostic: the rules are plain Markdown in `AGENTS.md`,
+skills are `SKILL.md` files in `skills/`, and temporary files go to `tmp/`.
+Nothing depends on one agent's features.
+
+| Agent | How it finds the rules and skills |
+|---|---|
+| Claude Code | `CLAUDE.md` and `.claude/skills/`, both symlinks |
+| Codex and other `AGENTS.md` readers | `AGENTS.md`; skills in `.agents/skills/` (symlink) where supported |
+| Gemini CLI | `GEMINI.md` (symlink) |
+| Anything else | Tell it: *"read AGENTS.md and follow it"*; the skill index in §5a covers the rest |
 
 ## Supported environments
 
@@ -103,16 +116,17 @@ and works the same on a headless machine without the desktop layer:
 
 The registry of managed computers is `hosts/README.md`, in the private hosts
 repository. This root README contains no hostname, because this repository is
-published and `hosts/` never is ([CLAUDE.md](CLAUDE.md) §8).
+published and `hosts/` never is ([AGENTS.md](AGENTS.md) §8).
 
 A fresh clone of this repository has no machines — `hosts/` appears only when
 you clone your hosts repository or create a new one. Each further machine is
 added to the registry as soon as its `facts.md` exists; keeping the table
-current is part of the rules ([CLAUDE.md](CLAUDE.md) §4).
+current is part of the rules ([AGENTS.md](AGENTS.md) §4).
 
 ## Skills
 
-Workflows Claude can run on request (in any language):
+Workflows the agent runs on request (in any language). Each lives in
+`skills/<name>/SKILL.md` and is indexed in [AGENTS.md](AGENTS.md) §5a:
 
 | Skill | Purpose |
 |---|---|
@@ -135,5 +149,5 @@ is never made public, not even anonymised.
 
 This repository is public. Both pushes, to the public and to the hosts
 repository, need approval, and before every public push the outgoing commits
-pass the private-data sieve from [CLAUDE.md](CLAUDE.md) §8b. The publishing
-procedure is in [CLAUDE.md](CLAUDE.md) §8c.
+pass the private-data sieve from [AGENTS.md](AGENTS.md) §8b. The publishing
+procedure is in [AGENTS.md](AGENTS.md) §8c.

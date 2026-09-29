@@ -21,7 +21,7 @@ of everything that could be tightened.
    answer to *who would exploit this, and from where can they reach it*, you
    get an audit in which twenty harmless rows bury one real hole.
 
-The audit **never fixes anything.** A fix is a separate task under CLAUDE.md §3a.
+The audit **never fixes anything.** A fix is a separate task under AGENTS.md §3a.
 
 ## Rules of engagement
 
@@ -75,7 +75,7 @@ you cannot write that answer does not belong in the table.
 
 ## What is not a finding
 
-Per CLAUDE.md §6, the distribution default is not reported as a hole. Verify it
+Per AGENTS.md §6, the distribution default is not reported as a hole. Verify it
 before you write the row: `rpm -V <package>` (or `dpkg -V`), or by confirming
 that no custom configuration file exists at all.
 
@@ -101,7 +101,7 @@ ip -brief address; ip route get 1.1.1.1
 On a machine managed over SSH (listed under `[remote]` in `hosts/sysadmin.toml`),
 use its hostname instead of `$(hostname)` and run every command in this skill
 through `ssh -a -o BatchMode=yes <alias>`. Root reads use the two-line handoff
-from CLAUDE.md §4.
+from AGENTS.md §4.
 
 Without the facts you cannot tell the right firewall, LSM or package manager.
 From `ip`, find out whether the machine is behind NAT (address from 10/8,
@@ -292,7 +292,7 @@ the armchair; always report it.
 
 **In the report you write the path and the nature, never the contents.** The
 report gets committed, so a token value, key contents or a password must never
-end up in it (CLAUDE.md §7). A correct finding reads "`~/.git-credentials`
+end up in it (AGENTS.md §7). A correct finding reads "`~/.git-credentials`
 exists, permissions `0644`" — not what is inside. That is why `grep -rl` (file
 names only), never `grep -r`.
 
@@ -430,7 +430,7 @@ Below the table:
 not write it by hand; build the JSON and run the generator:
 
 ```bash
-python3 .claude/skills/security-audit/audit.py findings.json
+python3 skills/security-audit/audit.py findings.json
 ```
 
 Without `-o` it derives the path itself:
@@ -471,8 +471,8 @@ The required keys of a finding are `sev`, `title`, `attacker`, `fix`; fill in
 ```
 
 The generator sorts the findings by risk and computes the summary counts
-itself — do not pre-sort them. Save the JSON to the scratchpad, not to the
-repository, and **check it for secrets before running the generator**: a token
+itself — do not pre-sort them. Save the JSON to `tmp/`, not to a tracked
+file, and **check it for secrets before running the generator**: a token
 value, key contents, a password from a config file or the machine's public IP
 address do not belong in a committed report.
 

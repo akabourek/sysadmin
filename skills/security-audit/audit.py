@@ -14,7 +14,7 @@ free-text values from the JSON are rendered as given.
 
 The report gets committed: the JSON must never contain a token value, key
 contents or a password - only the path, permissions and nature of the finding
-(CLAUDE.md §7).
+(AGENTS.md §7).
 """
 
 import argparse

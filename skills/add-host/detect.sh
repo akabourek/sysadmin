@@ -1,6 +1,6 @@
-# Detection set for a new machine (CLAUDE.md §4). Read-only, no root, writes nothing.
+# Detection set for a new machine (AGENTS.md §4). Read-only, no root, writes nothing.
 # Run on the machine itself, after approval:
-#   mkdir -p tmp && bash .claude/skills/add-host/detect.sh > tmp/detect.txt 2>&1
+#   mkdir -p tmp && bash skills/add-host/detect.sh > tmp/detect.txt 2>&1
 # The output contains the machine-id, addresses and a list of services. It does not belong in a commit (tmp/ is in .gitignore).
 # A missing tool is printed as "(x missing)", so "not there" can be told apart from "found nothing".
 export LC_ALL=C
@@ -67,7 +67,7 @@ s avahi;                  unit avahi-daemon
 s user;                   id; getent passwd "$(id -un)" | cut -d: -f7
 s tools
 for b in bash fish zsh git python3 tmux screen curl sudo; do printf '%s: %s\n' "$b" "$(command -v $b || echo missing)"; done
-printf 'claude: %s\n' "$(command -v claude || ls ~/.local/bin/claude 2>/dev/null || echo missing)"
+for a in claude codex gemini opencode aider; do printf 'agent %s: %s\n' "$a" "$(command -v $a || ls ~/.local/bin/$a 2>/dev/null || echo missing)"; done
 s services-enabled;       systemctl list-unit-files --state=enabled --type=service --no-legend
 s services-failed;        systemctl --failed --no-legend
 s logind;                 grep -hvE '^#|^$|^\[' /etc/systemd/logind.conf /etc/systemd/logind.conf.d/*.conf 2>/dev/null || echo "(defaults)"
