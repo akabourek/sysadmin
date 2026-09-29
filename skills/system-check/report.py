@@ -99,7 +99,7 @@ def stamp(fmt):
 
 def default_out(data, suffix="check"):
     """hosts/<hostname>/reports/<YYYY-MM-DD_HHMM>-<suffix>.md in the repo root."""
-    root = pathlib.Path(__file__).resolve().parents[3]
+    root = pathlib.Path(__file__).resolve().parents[2]
     host = data.get("hostname") or socket.gethostname()
     d = root / "hosts" / host / "reports"
     d.mkdir(parents=True, exist_ok=True)
@@ -172,7 +172,7 @@ def main():
                     help="report language; overrides `language` in hosts/sysadmin.toml "
                          "(default: en)")
     a = ap.parse_args()
-    lang = load_language(pathlib.Path(__file__).resolve().parents[3], a.lang)
+    lang = load_language(pathlib.Path(__file__).resolve().parents[2], a.lang)
     raw = sys.stdin.read() if a.json == "-" else open(a.json, encoding="utf-8").read()
     data = json.loads(raw)
     out = pathlib.Path(a.out) if a.out else default_out(data)

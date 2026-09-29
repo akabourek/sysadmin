@@ -154,7 +154,7 @@ def stamp(fmt):
 
 def default_out(data, suffix="leftovers"):
     """hosts/<hostname>/reports/<YYYY-MM-DD_HHMM>-<suffix>.md in the repo root."""
-    root = pathlib.Path(__file__).resolve().parents[3]
+    root = pathlib.Path(__file__).resolve().parents[2]
     host = data.get("hostname") or socket.gethostname()
     d = root / "hosts" / host / "reports"
     d.mkdir(parents=True, exist_ok=True)
@@ -252,7 +252,7 @@ def main():
     a = ap.parse_args()
     raw = sys.stdin.read() if a.json == "-" else open(a.json, encoding="utf-8").read()
     data = json.loads(raw)
-    lang = load_language(pathlib.Path(__file__).resolve().parents[3], a.lang)
+    lang = load_language(pathlib.Path(__file__).resolve().parents[2], a.lang)
     out = pathlib.Path(a.out) if a.out else default_out(data)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(build(data, lang), encoding="utf-8")

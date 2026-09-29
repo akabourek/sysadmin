@@ -25,7 +25,7 @@ import socket
 import sys
 import tomllib
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
+ROOT = pathlib.Path(__file__).resolve().parents[2]
 
 RISK_CODES = ("R1", "R2", "R3", "R4")
 
